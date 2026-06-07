@@ -1,3 +1,8 @@
+---
+name: mutation-testing
+description: "Comprehensive reference on mutation testing: theory, tools, operators, CI/CD integration, adoption strategies, and common pitfalls."
+---
+
 # Mutation Testing
 
 ## Overview
