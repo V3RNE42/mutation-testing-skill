@@ -1,6 +1,6 @@
-# Mutation Testing — Hermes Agent Skill 🧬
+# Mutation Testing
 
-> A comprehensive Hermes Agent skill for mutation testing: theory, tools, operators, CI/CD integration, and adoption strategies.
+> A comprehensive reference on mutation testing: theory, tools, operators, CI/CD integration, and adoption strategies.
 
 ## What is Mutation Testing?
 
@@ -12,7 +12,7 @@ Mutation:  "Would my test catch a bug   → quality metric
             on this line?"
 ```
 
-## What This Skill Covers
+## What This Covers
 
 - **Theory**: Strong vs Weak vs Firm mutation, mutation score calculation
 - **Operators**: Full taxonomy (MOTHRA, PIT, StrykerJS, language-specific)
@@ -22,38 +22,18 @@ Mutation:  "Would my test catch a bug   → quality metric
 - **Problems & Solutions**: Equivalent mutants, mutant explosion, computational cost
 - **Quick Start Guide**: Baseline → analyze → improve → integrate → scale
 
-## Usage
-
-Load the skill in any Hermes Agent session:
-
-```python
-from hermes_tools import skill_view
-skill_view("mutation-testing")
-```
-
-Or just ask your agent about mutation testing — the skill auto-triggers on relevant queries.
-
 ## Key Metrics
 
 | Metric | Impact |
 |--------|--------|
-| Production defect reduction | 25–30% |
-| CI overhead | 15–20% |
+| Production defect reduction | 25-30% |
+| CI overhead | 15-20% |
 | Technical debt reduction | 35% |
 
 ## Industry Adoption
 
-Used by: **Google**, **Meta**, **Spotify**, **Microsoft**
-
-## Installation as Local Skill
-
-Clone into your Hermes skills directory:
-
-```bash
-git clone https://github.com/V3RNE42/mutation-testing-skill.git \
-  ~/.hermes/skills/software-development/mutation-testing
-```
+Used by: **Google**, **Meta**, **Spotify**, **Microsoft**, **The Ladders**, **BSkyB**
 
 ## License
 
-MIT — use freely, modify, share.
+MIT

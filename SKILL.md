@@ -1,22 +1,10 @@
----
-name: mutation-testing
-description: "Use when asked about mutation testing, test quality measurement, mutation score, mutation operators, equivalent mutants, or integrating mutation testing into CI/CD pipelines."
-version: 2.0.0
-author: Hermes Agent
-license: MIT
-metadata:
-  hermes:
-    tags: [mutation-testing, testing, software-quality, code-coverage, test-automation]
-    related_skills: [code-quality-workflow, systematic-debugging, better-prompt]
----
-
 # Mutation Testing
 
-## Overview — What This Skill Covers
+## Overview
 
 Mutation testing is a **fault-based testing technique** that measures test *quality* — not just what lines execute (coverage), but whether tests can actually detect bugs. It is the gold standard of test metrics.
 
-**The chain of reasoning this skill builds:**
+**The chain of reasoning:**
 
 ```
 Code Coverage (quantity)
@@ -32,7 +20,7 @@ Test improvement → CI thresholds → Production defect reduction
 
 ## When to Use / When Not
 
-| USE when user asks about | DO NOT USE for |
+| USE when you need to know | DO NOT USE for |
 |---|---|
 | "How do I know if my tests are actually good?" | General testing strategy advice |
 | Mutation testing tools (PIT, Stryker, MutMut) | Test automation framework selection |
@@ -65,8 +53,8 @@ Mutation Score = Killed / (Total - Equivalent) × 100
 | Score | Meaning | Action |
 |---|---|---|
 | < 60% | Tests are weak | Write meaningful assertions, cover edge cases |
-| 60–80% | Acceptable | Target survivors with highest risk |
-| 80–90% | Good | Review remaining survivors for equivalent mutants |
+| 60-80% | Acceptable | Target survivors with highest risk |
+| 80-90% | Good | Review remaining survivors for equivalent mutants |
 | > 90% | Excellent | Verify no trivial tests inflating score |
 
 **The coverage-mutation gap:** 90% line coverage typically yields only 60-70% mutation score with decent tests, or 30-40% with weak tests. This gap is *expected* — don't panic, improve systematically.
@@ -89,16 +77,16 @@ Mutation Score = Killed / (Total - Equivalent) × 100
 
 | Group | Mutator | Effect | Default |
 |---|---|---|---|
-| **DEFAULTS** | CONDITIONALS_BOUNDARY | `<` ↔ `<=`, `>` ↔ `>=` | ✅ |
-| | INCREMENTS | `i++` ↔ `i--` (local vars only) | ✅ |
-| | INVERT_NEGS | `-x` → `x` | ✅ |
-| | MATH | `+` → `-`, `*` → `/`, `&` → `\|`, `<<` → `>>` | ✅ |
-| | NEGATE_CONDITIONALS | `==` ↔ `!=`, `<` ↔ `>=` | ✅ |
-| | VOID_METHOD_CALLS | Remove void method calls | ✅ |
-| | EMPTY/FALSE/TRUE/NULL/PRIMITIVE returns | Mutate return values per type | ✅ |
-| **STRONGER** | REMOVE_CONDITIONALS | Force if to always true/false | ❌ |
-| | EXPERIMENTAL_SWITCH | Modify switch cases | ❌ |
-| **ALL** | INLINE_CONSTS, CONSTRUCTOR_CALLS, NON_VOID_METHOD_CALLS, AOR, ROR, UOI, etc. | Full spectrum | ❌ |
+| **DEFAULTS** | CONDITIONALS_BOUNDARY | `<` ↔ `<=`, `>` ↔ `>=` | Yes |
+| | INCREMENTS | `i++` ↔ `i--` (local vars only) | Yes |
+| | INVERT_NEGS | `-x` → `x` | Yes |
+| | MATH | `+` → `-`, `*` → `/`, `&` → `\|`, `<<` → `>>` | Yes |
+| | NEGATE_CONDITIONALS | `==` ↔ `!=`, `<` ↔ `>=` | Yes |
+| | VOID_METHOD_CALLS | Remove void method calls | Yes |
+| | EMPTY/FALSE/TRUE/NULL/PRIMITIVE returns | Mutate return values per type | Yes |
+| **STRONGER** | REMOVE_CONDITIONALS | Force if to always true/false | No |
+| | EXPERIMENTAL_SWITCH | Modify switch cases | No |
+| **ALL** | INLINE_CONSTS, CONSTRUCTOR_CALLS, NON_VOID_METHOD_CALLS, AOR, ROR, UOI, etc. | Full spectrum | No |
 
 **Design rationale:** PIT's defaults are "stable" — hard to detect trivially, few equivalent mutants. Classic AOR/ROR/UOI inflate scores with easy-to-kill mutants. Start with DEFAULTS, escalate to STRONGER for critical modules, ALL only for audits.
 
@@ -219,9 +207,9 @@ Record score. This is your starting point.
 
 ### Step 3: Improve Tests
 
-1. Write test targeting the mutated behavior → passes on original code
-2. Re-run mutation testing → mutant should be killed
-3. If it survives → check for equivalent mutant
+1. Write test targeting the mutated behavior — passes on original code
+2. Re-run mutation testing — mutant should be killed
+3. If it survives — check for equivalent mutant
 
 ### Step 4: Validate & Lock in CI
 
@@ -258,10 +246,10 @@ Post-run feedback loop:
 
 | Risk | Min | Target | Break CI? |
 |---|---|---|---|
-| 🔴 Critical (finance, auth, health) | 80% | 90%+ | Yes |
-| 🟡 Core (business logic) | 60% | 80% | Gradual |
-| 🟢 Infra / glue | 40% | 60% | Report only |
-| ⚪ Legacy | Baseline | — | No |
+| Critical (finance, auth, health) | 80% | 90%+ | Yes |
+| Core (business logic) | 60% | 80% | Gradual |
+| Infra / glue | 40% | 60% | Report only |
+| Legacy | Baseline | — | No |
 
 ## VII — Hard Problems
 
@@ -302,10 +290,10 @@ int x = a + 0;  →  int x = a;   // Equivalent — same semantics
 
 | Metric | Value | Source |
 |---|---|---|
-| Production defect reduction | 25–30% | Multi-study surveys |
-| CI overhead (large projects) | 15–20% | Practice reports |
+| Production defect reduction | 25-30% | Multi-study surveys |
+| CI overhead (large projects) | 15-20% | Practice reports |
 | Technical debt reduction | 35% | Adopter surveys |
-| Initial velocity impact | 10–15% (temporary) | Rollout studies |
+| Initial velocity impact | 10-15% (temporary) | Rollout studies |
 
 **Adopters:** Google (internal), Meta (core modules), Spotify (StrykerJS), Microsoft (Stryker.NET), The Ladders (PIT — "90% score made coverage irrelevant"), BSkyB (PIT — "find redundant code").
 
