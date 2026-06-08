@@ -1,61 +1,56 @@
 # Mutation Testing
 
-> A comprehensive reference on mutation testing: theory, tools, operators, CI/CD integration, and adoption strategies.
-> Covers **Java (PIT)**, **C# (Stryker.NET)**, **TypeScript/JavaScript (StrykerJS)**, **Python (MutMut)**, and more.
+> Actionable workflows and language-specific references for mutation testing: measure test quality, interpret survivors, improve tests, and lock in CI.
 
 ## What is Mutation Testing?
 
-Mutation testing is the **gold standard** of test quality metrics. Unlike code coverage (which only measures what lines are *executed*), mutation testing measures whether your tests can **actually detect bugs** — by introducing small changes (mutations) into the code and checking if the tests catch them.
+Code coverage tells you what lines *execute*. Mutation testing tells you if your tests can **actually catch bugs** — by introducing small changes (mutations) into the code and checking if the tests fail.
 
 ```
-Coverage:  "Did this line run?"         → quantity metric
-Mutation:  "Would my test catch a bug   → quality metric
+Coverage:  "Did this line run?"         → quantity
+Mutation:  "Would my test catch a bug   → quality
             on this line?"
 ```
+
+**The goal is not a number.** It's a test suite that reliably detects real bugs — boundary conditions, logic inversions, missing edge cases. Each survivor is a concrete hint: "write a test for this edge case."
 
 ## Repository Structure
 
 ```
-SKILL.md                          # Main reference (~400 lines)
+SKILL.md                              # Actionable workflow + pointers per language
 references/
-├── dotnet-mutation-testing.md    # C# / .NET deep dive (985 lines)
-├── typescript-mutation-testing.md # TypeScript/JS deep dive (1,707 lines)
-├── quick-reference.md            # Cheat sheet
-└── key-papers.md                 # Academic papers and resources
+├── dotnet-mutation-testing.md        # C# / .NET (Stryker.NET)
+├── typescript-mutation-testing.md    # TypeScript / JavaScript (StrykerJS)
+├── java-mutation-testing.md          # Java / Kotlin (PIT)
+├── python-mutation-testing.md        # Python (MutMut)
+├── quick-reference.md                # Cheat sheet (commands, config, CI)
+└── key-papers.md                     # Academic papers and resources
 ```
 
-## What This Covers
+Each language reference is **self-contained**: install → config → mutator tables → CI/CD → performance → pitfalls → equivalent mutants.
 
-- **Theory**: Strong vs Weak vs Firm mutation, mutation score calculation
-- **Operators**: Full taxonomy (MOTHRA, PIT, StrykerJS, Stryker.NET — language-specific)
-- **Tools per Language**: PIT (Java), Stryker.NET (C#), StrykerJS (JS/TS), MutMut (Python), cargo-mutants (Rust), and more
-- **Higher Order Mutation (HOM)**: Subsuming and masked mutants
-- **CI/CD Integration**: Incremental per PR, nightly, critical module enforcement
-- **Problems & Solutions**: Equivalent mutants, mutant explosion, computational cost
-- **Language-Specific Pitfalls**: IL weaving, async/await (C#); type erasure, decorators, JSX (TS)
+## What the Main SKILL.md Covers
 
-## Languages Covered in Depth
+- **End goal**: What mutation testing achieves and why it matters
+- **Theory**: Strong vs Weak vs Firm mutation, mutation score, operators (with C# examples)
+- **Actionable workflow**: Measure baseline → interpret survivors → improve tests → lock in CI
+- **CI/CD strategy**: Incremental per PR, thresholds by module risk
+- **Hard problems**: Equivalent mutants, mutant explosion, performance budget
+- **Language pointers**: Quick tool selection table + links to per-language references
 
-| Language | Tool | Reference File | Key Info |
-|---|---|---|---|
-| **C# (.NET)** | Stryker.NET | `references/dotnet-mutation-testing.md` | Only active C# tool. 19 mutator categories. LINQ, Checked, String method mutators. Microsoft-recommended. |
-| **TypeScript / JavaScript** | StrykerJS | `references/typescript-mutation-testing.md` | Only production-grade JS/TS tool. 15+ mutator categories. TS checker plugin. Vitest/Jest/Mocha support. |
-| **Java / Kotlin** | PIT (pitest) | SKILL.md (main section) | Bytecode-level. DEFAULTS/STRONGER/ALL groups. |
-| **Python** | MutMut | SKILL.md (main section) | Modern Python tool. |
-| **Rust** | cargo-mutants | SKILL.md (tool selection) | |
-| **Go** | go-mutesting | SKILL.md (tool selection) | |
+## Languages Covered
 
-## Key Metrics
-
-| Metric | Impact |
-|--------|--------|
-| Production defect reduction | 25-30% |
-| CI overhead | 15-20% |
-| Technical debt reduction | 35% |
-
-## Industry Adoption
-
-Used by: **Google**, **Meta**, **Spotify**, **Microsoft** (official .NET docs recommend Stryker.NET), **ING**, **Philips**, **Adyen**, **Angular**, **NestJS**, **Polly**, **ABP Framework**, **The Ladders**, **BSkyB**
+| Language | Tool | Reference |
+|---|---|---|
+| C# (.NET) | Stryker.NET | `references/dotnet-mutation-testing.md` |
+| TypeScript / JavaScript | StrykerJS | `references/typescript-mutation-testing.md` |
+| Java / Kotlin | PIT (pitest) | `references/java-mutation-testing.md` |
+| Python | MutMut | `references/python-mutation-testing.md` |
+| Scala | Stryker4s | SKILL.md (tool selection) |
+| Rust | cargo-mutants / mutagen | SKILL.md (tool selection) |
+| Ruby | mutant | SKILL.md (tool selection) |
+| Go | go-mutesting | SKILL.md (tool selection) |
+| Swift | Muter | SKILL.md (tool selection) |
 
 ## License
 
