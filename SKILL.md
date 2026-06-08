@@ -258,7 +258,7 @@ Language?
 Each reference is self-contained: install → config → mutator tables → CI/CD → performance → pitfalls → equivalent mutants.
 
 | Language | Reference |
-|---|---|---|
+|---|---|
 | **C# (.NET)** | `/references/dotnet-mutation-testing.md` | 
 | **TypeScript / JavaScript** | `/references/typescript-mutation-testing.md` | 
 | **Java / Kotlin** | `/references/java-mutation-testing.md` | 
