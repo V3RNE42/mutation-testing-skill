@@ -1,13 +1,6 @@
 ---
 name: mutation-testing
 description: "Actionable mutation testing workflow: measure test quality, interpret survivors, improve tests, lock in CI. Language-specific deep dives in ./references/."
-version: 2.0.0
-author: V3RNE42
-license: MIT
-metadata:
-  hermes:
-    tags: [testing, mutation-testing, quality, ci-cd, test-coverage]
-    related_skills: [code-quality-workflow, planning-methodology]
 ---
 
 # Mutation Testing
@@ -264,20 +257,20 @@ Language?
 
 Each reference is self-contained: install → config → mutator tables → CI/CD → performance → pitfalls → equivalent mutants.
 
-| Language | File | Reference |
+| Language | Reference |
 |---|---|---|
-| **C# (.NET)** | `references/dotnet-mutation-testing.md` | `references/dotnet-mutation-testing.md` |
-| **TypeScript / JavaScript** | `references/typescript-mutation-testing.md` | `references/typescript-mutation-testing.md` |
-| **Java / Kotlin** | `references/java-mutation-testing.md` | `references/java-mutation-testing.md` |
-| **Python** | `references/python-mutation-testing.md` | `references/python-mutation-testing.md` |
+| **C# (.NET)** | `/references/dotnet-mutation-testing.md` | 
+| **TypeScript / JavaScript** | `/references/typescript-mutation-testing.md` | 
+| **Java / Kotlin** | `/references/java-mutation-testing.md` | 
+| **Python** | `/references/python-mutation-testing.md` | 
 
 ### Quick Reference
 
-A cheat sheet with commands, config snippets, and CI examples: `references/quick-reference.md`
+A cheat sheet with commands, config snippets, and CI examples: `/references/quick-reference.md`
 
 ### Key Papers
 
-Foundational and modern research: `references/key-papers.md`
+Foundational and modern research: `/references/key-papers.md`
 
 ---
 
