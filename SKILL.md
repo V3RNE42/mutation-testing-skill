@@ -1,197 +1,188 @@
 ---
 name: mutation-testing
-description: "Comprehensive reference on mutation testing: theory, tools, operators, CI/CD integration, adoption strategies, and common pitfalls. Covers Java, C#, TypeScript/JavaScript, Python, and more. Deep-dive references in ./references/."
+description: "Actionable mutation testing workflow: measure test quality, interpret survivors, improve tests, lock in CI. Language-specific deep dives in ./references/."
 ---
 
 # Mutation Testing
 
-## Overview
+## What It Is & Why It Matters
 
 Mutation testing is a **fault-based testing technique** that measures test *quality* — not just what lines execute (coverage), but whether tests can actually detect bugs. It is the gold standard of test metrics.
 
+```csharp
+// Line coverage says: "this line runs" ✓
+// Mutation testing says: "can your tests tell the difference?"
+
+int total = price + tax;      // Original
+
+// Mutant: arithmetic swapped
+int total = price - tax;      // ← Did your test catch this?
+
+// If the mutant SURVIVES → your test assertion is too weak
+// If the mutant is KILLED    → your test actually validates the behavior
 ```
-Code Coverage (quantity)
-     ↓  is insufficient because
-Coverage = "lines executed" ≠ "faults detected"
-     ↓  enter
-Mutation Testing (quality)
-     ↓  measures
-Mutation Score = Killed / (Total - Equivalent) × 100
-     ↓  which drives
-Test improvement → CI thresholds → Production defect reduction
-```
+
+**The coverage–quality gap:** 90% line coverage typically yields only 60–70% mutation score with decent tests, or 30–40% with weak assertions. This gap is *expected* — and closing it is the point.
+
+### End Goal
+
+You are not chasing a number. You are building a **test suite that reliably detects real bugs** — boundary conditions, logic inversions, missing edge cases, null-safety lapses. When you achieve:
+
+| Score | What it means | You've achieved |
+|---|---|---|
+| > 80% | Core logic is guarded | Production defects from that module drop ~25–30% |
+| > 90% | Excellent protection | Confidence to refactor fearlessly |
+| Drift-down detected | CI catches regressions | Team can merge without quality surprise |
+
+**Mutation testing is not a gate — it's a feedback loop.** Each survivor is a concrete hint: "write a test for this edge case."
+
+---
 
 ## When to Use / When Not
 
-| USE when you need to know | DO NOT USE for |
+| USE when you need to know | DO NOT use for |
 |---|---|
-| "How do I know if my tests are actually good?" | General testing strategy advice |
-| Mutation testing tools (PIT, Stryker, MutMut) | Test automation framework selection |
-| "What is mutation score / mutation coverage" | Performance/load testing |
-| Comparing coverage vs mutation metrics | Manual test case design |
-| CI/CD integration of mutation testing | Code review (mutation finds test gaps, not design flaws) |
-| Equivalent mutants, HOM, selective mutation | |
-| Practical "how to start" guide | |
+| "Are my tests actually good, or just green?" | General testing strategy advice |
+| "Where are my test gaps?" | Test automation framework selection |
+| "Will my CI catch logic bugs?" | Performance / load testing |
+| "How do I compare coverage vs actual test quality?" | Code review (mutation finds test gaps, not design flaws) |
 
-## Reference Files (load on demand)
+---
 
-| File | Load with | Contents |
-|---|---|---|
-| `references/dotnet-mutation-testing.md` | `skill_view(name='mutation-testing', file_path='references/dotnet-mutation-testing.md')` | Stryker.NET: install, config, 19 mutator categories with C# examples, mutation levels, CI/CD, performance, .NET-specific pitfalls, equivalent mutant patterns, Stryker.NET vs StrykerJS comparison |
-| `references/typescript-mutation-testing.md` | `skill_view(name='mutation-testing', file_path='references/typescript-mutation-testing.md')` | StrykerJS: install, config, 15+ mutator categories with TS examples, test runners, TS checker, CI/CD, incremental mode, TS-specific pitfalls, React component testing, tools comparison |
-| `references/quick-reference.md` | `skill_view(name='mutation-testing', file_path='references/quick-reference.md')` | Cheat sheet: commands, config snippets, CI examples, coverage-score mapping |
-| `references/key-papers.md` | `skill_view(name='mutation-testing', file_path='references/key-papers.md')` | Academic papers, resources, reading order |
-
-## I — Theory: The Three Pillars
+## Theory — The Three Pillars (with C# examples)
 
 ### Pillar 1: Strong vs Weak vs Firm
 
-| Type | Condition to Kill | Cost | Used By |
-|---|---|---|---|
-| **Strong** | Test assertion fails (output differs) | Highest — full test run per mutant | PIT, Stryker (default) |
-| **Weak** | State *immediately after mutation* differs | Lower — check intermediate state | Academic tools |
-| **Firm** | State propagates partway | Intermediate | Hybrid approaches |
+| Type | Condition to Kill | Used By |
+|---|---|---|
+| **Strong** | Test assertion fails (output differs) | PIT, Stryker (default) |
+| **Weak** | State *immediately after mutation* differs | Academic tools |
+| **Firm** | State propagates partway | Hybrid approaches |
+
+All production tools use **strong mutation** — the test must actually fail.
 
 ### Pillar 2: Mutation Score
 
 ```
-Mutation Score = Killed / (Total - Equivalent) × 100
+Score = Killed / (Total - Equivalent) × 100
 ```
 
 | Score | Meaning | Action |
 |---|---|---|
-| < 60% | Tests are weak | Write meaningful assertions, cover edge cases |
-| 60-80% | Acceptable | Target survivors with highest risk |
-| 80-90% | Good | Review remaining survivors for equivalent mutants |
-| > 90% | Excellent | Verify no trivial tests inflating score |
+| < 60% | Tests are weak — write meaningful assertions, cover edge cases |
+| 60–80% | Acceptable — target survivors with highest risk |
+| 80–90% | Good — review remaining survivors for equivalent mutants |
+| > 90% | Excellent — verify no trivial tests inflate score |
 
-**The coverage-mutation gap:** 90% line coverage typically yields only 60-70% mutation score with decent tests, or 30-40% with weak tests. This gap is *expected*.
+### Pillar 3: Mutation Operators (C# — Stryker.NET)
 
-### Pillar 3: Mutation Operators
+```csharp
+// Arithmetic operator
+// Original         → Mutated
+int a = x + y;     → int a = x - y;    // AOR
 
-#### Classic Taxonomy (MOTHRA, FORTRAN — 22 operators)
+// Equality operator
+if (x > y)         → if (x < y)        // ROR
+if (x == y)        → if (x != y)       // ROR
 
-| Category | Operator | Example | What It Tests |
-|---|---|---|---|
-| Arithmetic | AOR | `+` → `-`, `*` → `/` | Math correctness |
-| Relational | ROR | `<` → `<=`, `>` → `==` | Boundary conditions |
-| Logical | LCR | `&&` → `\|\|` | Boolean logic |
-| Unary | UOI | `x` → `-x` | Sign/bit handling |
-| Absolute | ABS | `x` → `abs(x)`, `0` | Sign assumptions |
-| Statement | SDL | Delete a line | Dead/unreachable code |
-| Constant | CRP | `10` → `0`, `1`, `-1` | Magic number assumptions |
+// LINQ method swap
+items.All(pred)    → items.Any(pred)   // LINQ
+items.First()      → items.FirstOrDefault()
 
-#### Per-Language Mutator Tables
+// Logical operator
+a && b             → a || b            // LCR
 
-See the corresponding reference file for language-specific mutators:
+// Boolean literal
+bool flag = true;  → bool flag = false;
 
-| Language | Tool | Reference | Mutator Highlights |
-|---|---|---|---|
-| Java | PIT | `references/pit-mutation-testing.md` *(forthcoming)* | DEFAULTS / STRONGER / ALL groups, bytecode-level |
-| C# | Stryker.NET | `references/dotnet-mutation-testing.md` | 19 categories: LINQ (30+ pairs), Checked, String methods, Math methods, Null-coalescing, Regex, Collection expressions (C#12) |
-| JS/TS | StrykerJS | `references/typescript-mutation-testing.md` | 15+ categories: Arithmetic, Equality, Optional chaining, Array, Object literal, RegExp, Block, Assignment |
+// Null-coalescing
+a ?? b             → a                 // removal
 
-## II — Higher Order Mutation Testing (HOM)
+// String mutation
+"hello"            → ""                // empty
 
-Introduced by Harman et al. (2009): FOM = 1 mutation. HOM = 2+ combined.
-
-- **Subsuming HOM** — harder to kill than any component FOM. Represents subtle real-world bugs.
-- **Masked HOM** — one mutation masks another; survives despite weaker individual mutations.
-
-**Practical caveat:** HOM is research-advanced. FOM with good defaults catches 90%+. Only explore HOM for deep auditing of critical modules.
-
-## III — Tool Selection
-
-```
-Language?
-├── Java/Kotlin → PIT (pitest.org), pro: arcmutate
-├── C# → Stryker.NET (dotnet-stryker) ← only active tool
-├── JavaScript/TS → StrykerJS ← only production-grade tool
-├── Scala → Stryker4s
-├── Python → MutMut (modern) or MutPy (classic)
-├── Rust → cargo-mutants or mutagen
-├── Ruby → mutant
-├── Go → go-mutesting
-└── Swift → Muter (emerging, ⚠️ low activity)
+// Block removal
+void F() { Age++; } → void F() {}      // statement deleted
 ```
 
-### Quick Install
+For full mutator tables per language, see the corresponding language reference (`./references/`).
+
+---
+
+## Actionable Workflow
+
+### Step 1: Measure Baseline
 
 ```bash
-npm i -D @stryker-mutator/core                 # JS/TS
-pip install mutmut                              # Python
-dotnet tool install -g dotnet-stryker           # C# (.NET)
-# Java: add pitest-maven plugin to pom.xml
+# C# (Stryker.NET)
+dotnet stryker
+
+# TS/JS (StrykerJS)
+npx stryker run
+
+# Java (PIT)
+mvn pitest:mutationCoverage
+
+# Python (MutMut)
+mutmut run
 ```
 
-### Per-Language Deep Dives
-
-| Language | Status | Install | Config file | Key feature |
-|---|---|---|---|---|
-| **C#** | ✅ Active — Microsoft-recommended | `dotnet tool install -g dotnet-stryker` | `stryker-config.json` | Mutant schemata (no per-mutant recompilation). Mutation levels (Basic/Standard/Advanced/Complete). 19 mutator categories including LINQ, Checked, String methods. |
-| **TypeScript/JS** | ✅ Active — 6K★, 150K+ npm/week | `npm i -D @stryker-mutator/core` | `stryker.config.json` | AST-level instrumentation. TS checker plugin. Incremental mode. Vitest/Jest/Mocha support. JSX/TSX mutation. |
-| **Java** | ✅ Active — most mature | PIT Maven plugin | `pom.xml` | Bytecode-level. DEFAULTS/STRONGER/ALL. Longest track record. |
-
-See the corresponding reference in `references/` for full details (install, config, mutators, CI/CD, performance, pitfalls).
-
-## IV — Configuration Patterns by Goal
-
-| Goal | PIT (Java) | StrykerJS (JS/TS) | Stryker.NET (C#) | MutMut (Python) |
-|---|---|---|---|---|
-| **First run (measure)** | No config needed | `npx stryker run` | `dotnet stryker` | `mutmut run` |
-| **Focused (module)** | `targetClasses: ["core.*"]` | `"mutate": ["src/core/**"]` | `"mutate": ["src/core/**/*.cs"]` | `paths_to_mutate = src/core/` |
-| **CI gate** | `mutationThreshold: 80` | `thresholds: {high:80, low:70, break:true}` | `thresholds: {high:80, low:60, break:0}` via `--break-at` | N/A (post-process) |
-| **Full audit** | mutators: `STRONGER` | `"mutators": ["all"]` | `mutation-level: "Advanced"` | Default is full |
-| **Incremental** | N/A | `"incremental": true` | `"since": {"enabled": true, "target": "main"}` | N/A |
-| **Ignore patterns** | `excludedMethods` | `mutate: ["!**/*.spec.ts"]` | `ignore-mutations`, `ignore-methods` | `paths_to_mutate` exclusion |
-
-Config examples for each tool: see `references/quick-reference.md`.
-
-## V — Execution Workflow
-
-### Step 1: Baseline
-
-```bash
-npx stryker run         # JS/TS
-dotnet stryker          # C#
-mvn pitest:mutationCoverage  # Java
-mutmut run              # Python
-```
+**First run:** No config needed. Defaults will give you a baseline score. Record it — this is your starting point.
 
 ### Step 2: Interpret Survivors
 
 | Survivor Pattern | Root Cause | Fix |
 |---|---|---|
-| Boundary conditions survive (`<` vs `<=`) | No edge case tests | Add boundary value tests |
-| Logical operators survive (`&&` vs `\|\|`) | Branch not covered | Test each branch |
-| Return values survive | Assertions too loose | Assert exact values |
-| Method calls removed survive | Side effects not verified | Assert state changes |
-| Conditionals removed survive | Dead code or guard not tested | Test or remove |
+| Boundary survives (`<` vs `<=`) | No edge case tests | Add boundary: `value == min`, `value == max` |
+| Logical operator survives (`&&` vs `\|\|`) | Branch not covered | Test each branch independently |
+| Return value survives | Assertions too loose | Assert exact value, not just "not null" |
+| LINQ swap survives (`First` vs `FirstOrDefault`) | Missing empty-sequence case | Test with empty collection |
+| Method call removed survives | Side effects not verified | Assert state change, not just no exception |
+| Null-coalescing removed survives | Null case never exercised | Test with `null` input |
 
-Language-specific survivor patterns (LINQ, null-coalescing, optional chaining, etc.): see corresponding `references/` file.
+```csharp
+// Example: LINQ First() survived
+var result = items.First();   // Mutant: → items.FirstOrDefault()
+
+// Fix: add test for empty collection
+[Fact]
+public void Throws_when_empty()
+{
+    var items = new List<int>();
+    Assert.Throws<InvalidOperationException>(() => Sut.Process(items));
+}
+```
 
 ### Step 3: Improve Tests
 
-1. Write test targeting the mutated behavior — passes on original code
-2. Re-run mutation testing — mutant should be killed
-3. If it survives — check for equivalent mutant
+1. Pick the **most actionable survivor** (high-risk logic, not string literals)
+2. Write a test targeting the mutated behavior — passes on original code
+3. Re-run mutation testing on that file
+4. If the mutant survives → check for equivalent mutant. If not equivalent, strengthen the assertion
+5. Repeat. Each killed survivor is a genuine improvement
 
 ### Step 4: Validate & Lock in CI
 
-```
-Post-run feedback loop:
-  Score improved?   → Continue strategy
-  Score regressed?  → Check new code without tests
-  Unexpected EMs?   → Add to exclusion list
-  Repeated pattern? → Fix root cause in test design
+```bash
+dotnet stryker --break-at 60    # C# — fail CI under 60%
+npx stryker run --thresholds.break true  # TS/JS
+mvn pitest:mutationCoverage -DmutationThreshold=60  # Java
 ```
 
-## VI — CI/CD Integration
+**Feedback loop:**
+- Score improved? → Continue strategy
+- Score regressed? → Check new code without tests
+- Repeated survivor pattern? → Fix root cause in test design
+- Unexpected equivalent mutants? → Add to exclusion list
+
+---
+
+## CI/CD Strategy
 
 ### Priority
 
 ```
-[Best]   Incremental per PR   → changed files only. Seconds-minutes.
+[Best]   Incremental per PR   → changed files only. Seconds–minutes.
 [Better] Critical module gate → full mutation on core. Minutes.
 [Good]   Nightly full suite   → trend tracking. Hours. No blocking.
 [Worst]  Full suite every PR  → only for tiny codebases.
@@ -206,107 +197,86 @@ Post-run feedback loop:
 | Infra / glue | 40% | 60% | Report only |
 | Legacy | Baseline | — | No |
 
-### CI Examples by Language
+---
 
-See `references/quick-reference.md` or the per-language reference:
-
-- **C#:** `references/dotnet-mutation-testing.md` — GitHub Actions (basic + incremental + baseline), Azure DevOps
-- **JS/TS:** `references/typescript-mutation-testing.md` — GitHub Actions (incremental), GitLab CI, CircleCI, dashboard + badges
-- **Java:** PIT docs
-
-## VII — Hard Problems
+## Hard Problems
 
 ### 1. Equivalent Mutants
 
-```java
+Mutants that behave identically to the original — can't be killed by any test.
+
+```csharp
 int x = a + 0;  →  int x = a;   // Equivalent — same semantics
 ```
 
 **Detection (cheapest first):**
-1. Compiler equivalence — compile both with `-O3`. Same bytecode? Skip.
+1. Compiler equivalence — same bytecode? Skip.
 2. Automated filtering — PIT/Stryker detect common patterns
-3. LLM (ISSTA 2024) — ~85% accuracy. Pass survivors to classify.
-4. Human review — last resort.
+3. LLM (ISSTA 2024) — ~85% accuracy
+4. Human review — last resort
 
-Language-specific equivalent mutant patterns: see `references/dotnet-mutation-testing.md` (C#) and `references/typescript-mutation-testing.md` (TS).
+Language-specific patterns → see language reference.
 
 ### 2. Mutant Explosion
 
-10K LOC → thousands of mutants.
-
-| Strategy | How | Correlation | When |
-|---|---|---|---|
-| Sampling | Random 10% | ~0.98 | Exploratory |
-| Selective | Only ABS, UOI, LCR, AOR, ROR | ~90% | CI |
-| Diff-aware | Changed files only | Exact | Every PR |
-| Test selection | Coverage-based filter | Depends | Large projects |
+| Strategy | How | When |
+|---|---|---|
+| Sampling | Random 10% (correlation ~0.98) | Exploratory |
+| Selective | Only ABS, UOI, LCR, AOR, ROR (~90% coverage) | CI |
+| Diff-aware | Changed files only | Every PR |
+| Test selection | Coverage-based filter | Large projects |
 
 ### 3. Performance Budget
 
-| Scale | Mutants | Defaults | ALL | CI impact |
-|---|---|---|---|---|
-| 10K LOC | ~1K | ~3 min | ~15 min | Negligible |
-| 100K LOC | ~8K | ~20 min | ~2 h | 15-20% |
-| 1M LOC | ~50K | Hours | Days | Use incremental |
-
-## VIII — Industry Evidence
-
-| Metric | Value | Source |
+| Scale | Defaults | ALL |
 |---|---|---|
-| Production defect reduction | 25-30% | Multi-study surveys |
-| CI overhead (large projects) | 15-20% | Practice reports |
-| Technical debt reduction | 35% | Adopter surveys |
-| Initial velocity impact | 10-15% (temporary) | Rollout studies |
+| 10K LOC | ~3 min | ~15 min |
+| 100K LOC | ~20 min | ~2 h |
+| 1M LOC | Hours | Use incremental |
 
-**Adopters:** Google (internal), Meta (core modules), Spotify (StrykerJS), Microsoft (Stryker.NET — official docs), ING, Philips, Adyen, Angular, NestJS, Polly, ABP Framework, The Ladders, BSkyB.
+---
 
-## IX — Key Papers
+## Tool Selection by Language
 
-See `references/key-papers.md` for full details and reading order.
+```
+Language?
+├── C# (.NET)         → Stryker.NET  (dotnet-stryker)   ← only active tool
+├── Java / Kotlin     → PIT          (pitest.org)       ← most mature
+├── TypeScript / JS   → StrykerJS    (stryker-mutator.io) ← only production-grade
+├── Python            → MutMut       (mutmut)           ← modern choice
+├── Scala             → Stryker4s
+├── Rust              → cargo-mutants / mutagen
+├── Ruby              → mutant
+├── Go                → go-mutesting
+└── Swift             → Muter (emerging, low activity)
+```
 
-| Year | Title | Lead | Contribution |
-|---|---|---|---|
-| 1978 | *Hints on Test Data Selection* | DeMillo et al. | Founding paper |
-| 2009 | *Higher Order Mutation Testing* | Harman et al. | HOMs, subsuming mutants |
-| 2018 | *Mutation Testing Advances* | Papadakis et al. | Definitive survey |
-| 2024 | *Comparison of Python MT Tools* | ACM | CosmicRay, MutPy, MutMut, Mutatest |
-| 2024 | *LLMs for Equivalent Mutant Detection* | Zhao Tian et al. (ISSTA) | LLM classification |
-| 2024 | *Mutation Testing in Practice* | IEEE | Empirical OSS study |
+---
 
-## X — Pitfalls
+## Language Reference Pages
 
-### General (all languages)
+Each reference is self-contained: install → config → mutator tables → CI/CD → performance → pitfalls → equivalent mutants.
 
-1. **Full suite every PR** — use incremental. Full runs = nightly.
-2. **Ignoring equivalent mutants** — penalizes score unfairly.
-3. **Chasing 100%** — impossible (EMs). 85% solid > 100% trivial.
-4. **No baseline** — can't track improvement/regression.
-5. **No CI threshold** — scores drift down silently.
-6. **ALL mutators on every build** — DEFAULTS/Standard are enough.
-7. **Confusing coverage with mutation** — 90% coverage != 90% score.
-8. **Thinking mutation replaces code review** — different concerns.
-9. **No survivor review cadence** — weekly recommended.
-10. **Starting too late** — day 1 > month 1 > never.
-
-### Per-Language Pitfalls
-
-| Language | #1 Pitfall | Mitigation |
+| Language | File | Load with |
 |---|---|---|
-| **C#** | IL weavers (PostSharp, Fody) — aspects injected post-compile | `ignore-methods` for weaved methods |
-| **C#** | Async/await state machines — unreachable mutants | `ignore-methods` with `*MoveNext*` |
-| **C#** | Source generators — generated code not available | Exclude `**/*.g.cs`, `**/Migrations/*` |
-| **C#** | LINQ expression trees — mutations can't apply | Exclude heavy LINQ chains |
-| **TS/JS** | Mock-heavy tests kill few mutants | Prefer integration tests |
-| **TS/JS** | Snapshot tests pass most mutations | Write explicit assertions |
-| **TS/JS** | StrykerJS v9 requires Node 22+ | Verify Node version in CI |
-| **TS/JS** | Type checker is slow | Use selectively on critical modules |
-| **Java** | Lombok generated code | Exclude generated methods |
+| **C# (.NET)** | `references/dotnet-mutation-testing.md` | `skill_view(`mutation-testing`, `references/dotnet-mutation-testing.md`)` |
+| **TypeScript / JavaScript** | `references/typescript-mutation-testing.md` | `skill_view(`mutation-testing`, `references/typescript-mutation-testing.md`)` |
+| **Java / Kotlin** | `references/java-mutation-testing.md` | `skill_view(`mutation-testing`, `references/java-mutation-testing.md`)` |
+| **Python** | `references/python-mutation-testing.md` | `skill_view(`mutation-testing`, `references/python-mutation-testing.md`)` |
 
-Full per-language pitfalls with examples: see `references/dotnet-mutation-testing.md` and `references/typescript-mutation-testing.md`.
+### Quick Reference
+
+A cheat sheet with commands, config snippets, and CI examples: `skill_view('mutation-testing', 'references/quick-reference.md')`
+
+### Key Papers
+
+Foundational and modern research: `skill_view('mutation-testing', 'references/key-papers.md')`
+
+---
 
 ## Verification Checklist
 
-- [ ] Tool selected and installed
+- [ ] Tool selected and installed (see language reference)
 - [ ] Baseline score measured and documented
 - [ ] Thresholds configured (break/high/low)
 - [ ] Scope limited to relevant modules
@@ -314,5 +284,5 @@ Full per-language pitfalls with examples: see `references/dotnet-mutation-testin
 - [ ] Equivalent mutant filtering active
 - [ ] Survivor review cadence established
 - [ ] Team trained on interpretation
-- [ ] Dashboard/reporting active
-- [ ] Coverage-mutation gap communicated to stakeholders
+- [ ] Coverage–mutation gap communicated to stakeholders
+- [ ] Dashboard / reporting active

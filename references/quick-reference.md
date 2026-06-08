@@ -131,4 +131,6 @@ Codebase size?
 
 - C# (.NET) deep dive: `references/dotnet-mutation-testing.md`
 - TypeScript/JS deep dive: `references/typescript-mutation-testing.md`
+- Java/Kotlin deep dive: `references/java-mutation-testing.md`
+- Python deep dive: `references/python-mutation-testing.md`
 - Key papers: `references/key-papers.md`
