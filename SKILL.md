@@ -1,6 +1,13 @@
 ---
 name: mutation-testing
 description: "Actionable mutation testing workflow: measure test quality, interpret survivors, improve tests, lock in CI. Language-specific deep dives in ./references/."
+version: 2.0.0
+author: V3RNE42
+license: MIT
+metadata:
+  hermes:
+    tags: [testing, mutation-testing, quality, ci-cd, test-coverage]
+    related_skills: [code-quality-workflow, planning-methodology]
 ---
 
 # Mutation Testing
@@ -69,10 +76,10 @@ Score = Killed / (Total - Equivalent) × 100
 
 | Score | Meaning | Action |
 |---|---|---|
-| < 60% | Tests are weak — write meaningful assertions, cover edge cases |
-| 60–80% | Acceptable — target survivors with highest risk |
-| 80–90% | Good — review remaining survivors for equivalent mutants |
-| > 90% | Excellent — verify no trivial tests inflate score |
+| < 60% | Tests are weak | Write meaningful assertions, cover edge cases |
+| 60–80% | Acceptable | Target survivors with highest risk |
+| 80–90% | Good | Review remaining survivors for equivalent mutants |
+| > 90% | Excellent | Verify no trivial tests inflate score |
 
 ### Pillar 3: Mutation Operators (C# — Stryker.NET)
 
