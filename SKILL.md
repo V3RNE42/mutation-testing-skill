@@ -257,20 +257,20 @@ Language?
 
 Each reference is self-contained: install → config → mutator tables → CI/CD → performance → pitfalls → equivalent mutants.
 
-| Language | File | Load with |
+| Language | File | Reference |
 |---|---|---|
-| **C# (.NET)** | `references/dotnet-mutation-testing.md` | `skill_view(`mutation-testing`, `references/dotnet-mutation-testing.md`)` |
-| **TypeScript / JavaScript** | `references/typescript-mutation-testing.md` | `skill_view(`mutation-testing`, `references/typescript-mutation-testing.md`)` |
-| **Java / Kotlin** | `references/java-mutation-testing.md` | `skill_view(`mutation-testing`, `references/java-mutation-testing.md`)` |
-| **Python** | `references/python-mutation-testing.md` | `skill_view(`mutation-testing`, `references/python-mutation-testing.md`)` |
+| **C# (.NET)** | `references/dotnet-mutation-testing.md` | `references/dotnet-mutation-testing.md` |
+| **TypeScript / JavaScript** | `references/typescript-mutation-testing.md` | `references/typescript-mutation-testing.md` |
+| **Java / Kotlin** | `references/java-mutation-testing.md` | `references/java-mutation-testing.md` |
+| **Python** | `references/python-mutation-testing.md` | `references/python-mutation-testing.md` |
 
 ### Quick Reference
 
-A cheat sheet with commands, config snippets, and CI examples: `skill_view('mutation-testing', 'references/quick-reference.md')`
+A cheat sheet with commands, config snippets, and CI examples: `references/quick-reference.md`
 
 ### Key Papers
 
-Foundational and modern research: `skill_view('mutation-testing', 'references/key-papers.md')`
+Foundational and modern research: `references/key-papers.md`
 
 ---
 
